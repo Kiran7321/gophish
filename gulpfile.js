@@ -9,15 +9,19 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify-es').default,
     cleanCSS = require('gulp-clean-css'),
-    babel = require('gulp-babel'),
+    babel = require('gulp-babel');
 
-    js_directory = 'static/js/src/',
-    css_directory = 'static/css/',
-    vendor_directory = js_directory + 'vendor/',
-    app_directory = js_directory + 'app/',
-    dest_js_directory = 'static/js/dist/',
-    dest_css_directory = 'static/css/dist/';
+// Define paths
+const dest_directory = 'dist/';  // New output directory for deployment
+const dest_js_directory = dest_directory + 'js/';
+const dest_css_directory = dest_directory + 'css/';
 
+const js_directory = 'static/js/src/';
+const css_directory = 'static/css/';
+const vendor_directory = js_directory + 'vendor/';
+const app_directory = js_directory + 'app/';
+
+// Task for processing vendor JavaScript files
 vendorjs = function () {
     return gulp.src([
             vendor_directory + 'jquery.js',
@@ -41,15 +45,13 @@ vendorjs = function () {
             vendor_directory + 'ua-parser.min.js'
         ])
         .pipe(concat('vendor.js'))
-        .pipe(rename({
-            suffix: '.min'
-        }))
+        .pipe(rename({ suffix: '.min' }))
         .pipe(uglify())
         .pipe(gulp.dest(dest_js_directory));
 }
 
+// Task for processing Gophish app JavaScript files
 scripts = function () {
-    // Gophish app files - non-ES6
     return gulp.src([
             app_directory + 'autocomplete.js',
             app_directory + 'campaign_results.js',
@@ -65,15 +67,14 @@ scripts = function () {
             app_directory + 'webhooks.js',
             app_directory + 'passwords.js'
         ])
-        .pipe(rename({
-            suffix: '.min'
-        }))
+        .pipe(rename({ suffix: '.min' }))
         .pipe(uglify().on('error', function (e) {
             console.log(e);
         }))
         .pipe(gulp.dest(dest_js_directory + 'app/'));
 }
 
+// Task for processing CSS files
 styles = function () {
     return gulp.src([
             css_directory + 'bootstrap.min.css',
@@ -89,15 +90,14 @@ styles = function () {
             css_directory + 'select2.min.css',
             css_directory + 'select2-bootstrap.min.css',
         ])
-        .pipe(cleanCSS({
-            compatibilty: 'ie9'
-        }))
+        .pipe(cleanCSS({ compatibilty: 'ie9' }))
         .pipe(concat('gophish.css'))
         .pipe(gulp.dest(dest_css_directory));
 }
 
-exports.vendorjs = vendorjs
-exports.scripts = scripts
-exports.styles = styles
-exports.build = gulp.parallel(vendorjs, scripts, styles)
-exports.default = exports.build
+// Export tasks
+exports.vendorjs = vendorjs;
+exports.scripts = scripts;
+exports.styles = styles;
+exports.build = gulp.parallel(vendorjs, scripts, styles);
+exports.default = exports.build;
